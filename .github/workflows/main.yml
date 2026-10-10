@@ -1,0 +1,505 @@
+name: Build APK
+on:
+  workflow_dispatch:
+  push:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.7
+      - name: Create project files
+        run: |
+          mkdir -p app/src/main/java/com/mohit/ttsdata
+          cat > settings.gradle <<'EOF'
+          pluginManagement {
+              repositories { google(); mavenCentral(); gradlePluginPortal() }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories { google(); mavenCentral() }
+          }
+          rootProject.name = "TTSDataset"
+          include(":app")
+          EOF
+          cat > build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.5.2' apply false
+              id 'org.jetbrains.kotlin.android' version '1.9.24' apply false
+          }
+          EOF
+          cat > gradle.properties <<'EOF'
+          org.gradle.jvmargs=-Xmx2048m
+          android.nonTransitiveRClass=true
+          EOF
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+              id 'org.jetbrains.kotlin.android'
+          }
+          android {
+              namespace 'com.mohit.ttsdata'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.mohit.ttsdata"
+                  minSdk 26
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+              kotlinOptions { jvmTarget = '17' }
+          }
+          EOF
+          cat > app/src/main/AndroidManifest.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.RECORD_AUDIO" />
+              <application
+                  android:label="TTS डेटासेट"
+                  android:allowBackup="true"
+                  android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar">
+                  <activity android:name=".MainActivity" android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+          cat > app/src/main/java/com/mohit/ttsdata/Sentences.kt <<'EOF'
+          package com.mohit.ttsdata
+
+          object Sentences {
+              val HI = listOf(
+                  "नमस्ते, आज का मौसम बहुत अच्छा है।",
+                  "मुझे सुबह की ताज़ी हवा में टहलना पसंद है।",
+                  "क्या आप मुझे बता सकते हैं कि बाज़ार किस तरफ़ है?",
+                  "भारत की राजधानी नई दिल्ली है।",
+                  "हम सब मिलकर यह काम जल्दी पूरा करेंगे।",
+                  "कल शाम को मेरे दोस्त के घर दावत है।",
+                  "पढ़ाई में मेहनत करने वाले विद्यार्थी हमेशा सफल होते हैं।",
+                  "कृपया दरवाज़ा बंद कर दीजिए, बाहर बहुत शोर है।",
+                  "आज रसोई में गरम-गरम पराठे बने हैं।",
+                  "बारिश की पहली बूँदें मिट्टी को महका देती हैं।",
+                  "मेरा नाम मोहित है और मैं राजस्थान में रहता हूँ।",
+                  "समय पर उठना और समय पर सोना स्वस्थ जीवन की कुंजी है।",
+                  "किताबें हमारी सबसे अच्छी मित्र होती हैं।",
+                  "क्या तुमने आज का समाचार सुना?",
+                  "यह रास्ता सीधा स्टेशन तक जाता है।",
+                  "बच्चे मैदान में खुशी से खेल रहे हैं।",
+                  "हमें अपने बड़ों का आदर करना चाहिए।",
+                  "मैंने कल रात एक बहुत सुंदर सपना देखा।",
+                  "शिक्षक ने कक्षा में आज नया पाठ पढ़ाया।",
+                  "चाय में थोड़ी अदरक डालो तो स्वाद बढ़ जाता है।",
+                  "पाँच, दस, पंद्रह, बीस, पच्चीस और तीस।",
+                  "रविवार को हम सब परिवार के साथ घूमने जाएँगे।",
+                  "ईमानदारी सबसे अच्छी नीति है।",
+                  "पहाड़ों की चोटियों पर सफ़ेद बर्फ़ चमक रही थी।",
+                  "कृपया अपना मोबाइल फ़ोन चुप कर लीजिए।",
+                  "मुझे गाने सुनना और कहानियाँ पढ़ना बहुत पसंद है।",
+                  "धन्यवाद, आपकी मदद के लिए मैं आपका आभारी हूँ।",
+                  "सूरज पूरब से निकलता है और पश्चिम में डूबता है।",
+                  "आज की परीक्षा मेरी उम्मीद से ज़्यादा आसान थी।",
+                  "जो लोग धैर्य रखते हैं, उन्हें अंत में सफलता ज़रूर मिलती है।"
+              )
+              val EN = listOf(
+                  "Hello, the weather is really pleasant today.",
+                  "I enjoy taking a walk in the fresh morning air.",
+                  "Could you please tell me where the market is?",
+                  "The capital of India is New Delhi.",
+                  "Together we will finish this work quickly.",
+                  "There is a dinner at my friend's house tomorrow evening.",
+                  "Hard-working students are usually successful.",
+                  "Please close the door, it is very noisy outside.",
+                  "Hot, buttery flatbreads are being made in the kitchen today.",
+                  "The first drops of rain make the soil smell wonderful.",
+                  "My name is Mohit and I live in Rajasthan.",
+                  "Waking up early and sleeping on time is the key to a healthy life.",
+                  "Books are our best friends.",
+                  "Did you hear the news today?",
+                  "This road goes straight to the railway station.",
+                  "The children are playing happily in the field.",
+                  "We should always respect our elders.",
+                  "Last night I had a very beautiful dream.",
+                  "The teacher taught a new lesson in class today.",
+                  "A little ginger makes tea taste better.",
+                  "One, two, three, four, five, six, seven, eight, nine, ten.",
+                  "On Sunday we will go out together with the family.",
+                  "Honesty is the best policy.",
+                  "White snow was shining on the mountain peaks.",
+                  "Please put your mobile phone on silent.",
+                  "I love listening to music and reading stories.",
+                  "Thank you, I am grateful for your help.",
+                  "The sun rises in the east and sets in the west.",
+                  "Today's exam was easier than I expected.",
+                  "Those who stay patient eventually find success."
+              )
+          }
+          EOF
+          cat > app/src/main/java/com/mohit/ttsdata/MainActivity.kt <<'EOF'
+          package com.mohit.ttsdata
+
+          import android.Manifest
+          import android.app.Activity
+          import android.app.AlertDialog
+          import android.content.pm.PackageManager
+          import android.media.*
+          import android.os.Bundle
+          import android.view.View
+          import android.widget.*
+          import java.io.ByteArrayOutputStream
+          import java.io.File
+          import java.nio.ByteBuffer
+          import java.nio.ByteOrder
+          import java.util.Locale
+
+          class MainActivity : Activity() {
+              private val RATE = 22050
+              private lateinit var base: File
+              private var projDir: File? = null
+              private var sentences: List<String> = emptyList()
+              private var idx = 0
+              @Volatile private var recFlag = false
+              @Volatile private var discard = false
+              private var recThread: Thread? = null
+              private var player: MediaPlayer? = null
+              private var tvStatus: TextView? = null
+              private var tvSentence: TextView? = null
+              private var btnRec: Button? = null
+
+              override fun onCreate(b: Bundle?) {
+                  super.onCreate(b)
+                  base = File(filesDir, "projects")
+                  base.mkdirs()
+                  showHome()
+              }
+
+              override fun onPause() {
+                  super.onPause()
+                  stopRecording(true)
+                  releasePlayer()
+              }
+
+              override fun onBackPressed() {
+                  if (projDir != null) showHome() else super.onBackPressed()
+              }
+
+              // ---------- UI helpers ----------
+              private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
+
+              private fun page(views: List<View>): ScrollView {
+                  val col = LinearLayout(this)
+                  col.orientation = LinearLayout.VERTICAL
+                  col.setPadding(dp(16), dp(16), dp(16), dp(16))
+                  for (v in views) col.addView(v)
+                  val sv = ScrollView(this)
+                  sv.addView(col)
+                  return sv
+              }
+
+              private fun tv(t: String, size: Float = 18f): TextView {
+                  val x = TextView(this)
+                  x.text = t
+                  x.textSize = size
+                  x.setPadding(0, dp(8), 0, dp(8))
+                  return x
+              }
+
+              private fun btn(t: String, f: () -> Unit): Button {
+                  val x = Button(this)
+                  x.text = t
+                  x.textSize = 18f
+                  x.setOnClickListener { f() }
+                  return x
+              }
+
+              private fun announce(m: String) {
+                  window.decorView.announceForAccessibility(m)
+              }
+
+              // ---------- file helpers ----------
+              private fun loadSentences(d: File): List<String> {
+                  val f = File(d, "sentences.txt")
+                  return if (f.exists()) f.readLines().filter { it.isNotBlank() } else emptyList()
+              }
+
+              private fun wav(d: File, i: Int): File =
+                  File(File(d, "wavs"), String.format(Locale.US, "audio_%03d.wav", i + 1))
+
+              private fun saveMeta(d: File) {
+                  val sb = StringBuilder()
+                  for (i in sentences.indices) {
+                      if (wav(d, i).exists()) {
+                          sb.append(String.format(Locale.US, "audio_%03d", i + 1))
+                          sb.append('|').append(sentences[i]).append('\n')
+                      }
+                  }
+                  File(d, "metadata.csv").writeText(sb.toString())
+              }
+
+              private fun writeWav(f: File, pcm: ByteArray) {
+                  val h = ByteBuffer.allocate(44).order(ByteOrder.LITTLE_ENDIAN)
+                  h.put("RIFF".toByteArray()); h.putInt(36 + pcm.size); h.put("WAVE".toByteArray())
+                  h.put("fmt ".toByteArray()); h.putInt(16); h.putShort(1); h.putShort(1)
+                  h.putInt(RATE); h.putInt(RATE * 2); h.putShort(2); h.putShort(16)
+                  h.put("data".toByteArray()); h.putInt(pcm.size)
+                  f.outputStream().use { it.write(h.array()); it.write(pcm) }
+              }
+
+              // ---------- screens ----------
+              private fun showHome() {
+                  stopRecording(true)
+                  releasePlayer()
+                  projDir = null; tvStatus = null; tvSentence = null; btnRec = null
+                  val v = ArrayList<View>()
+                  v.add(tv("TTS डेटासेट रिकॉर्डर", 24f))
+                  v.add(btn("नया प्रोजेक्ट बनाएँ") { newProject() })
+                  val dirs = base.listFiles()?.filter { it.isDirectory }?.sortedBy { it.name } ?: emptyList()
+                  if (dirs.isEmpty()) v.add(tv("अभी कोई प्रोजेक्ट नहीं है। ऊपर के बटन से नया बनाएँ।"))
+                  for (d in dirs) {
+                      val s = loadSentences(d)
+                      val done = s.indices.count { wav(d, it).exists() }
+                      v.add(btn("${d.name} — ${s.size} में से $done रिकॉर्ड हुए") { openProject(d) })
+                  }
+                  setContentView(page(v))
+              }
+
+              private fun newProject() {
+                  val et = EditText(this)
+                  et.hint = "प्रोजेक्ट का नाम, जैसे Mohit_Hindi_Voice_1"
+                  AlertDialog.Builder(this)
+                      .setTitle("नया प्रोजेक्ट")
+                      .setView(et)
+                      .setPositiveButton("हिंदी") { _, _ -> createProject(et.text.toString(), "hi") }
+                      .setNegativeButton("English") { _, _ -> createProject(et.text.toString(), "en") }
+                      .setNeutralButton("रद्द करें", null)
+                      .show()
+              }
+
+              private fun createProject(raw: String, lang: String) {
+                  val name = raw.trim().replace(Regex("[^\\p{L}\\p{N}_-]"), "_")
+                  if (name.isEmpty()) {
+                      Toast.makeText(this, "नाम खाली है", Toast.LENGTH_LONG).show()
+                      return
+                  }
+                  val d = File(base, name)
+                  if (d.exists()) {
+                      Toast.makeText(this, "इस नाम का प्रोजेक्ट पहले से है", Toast.LENGTH_LONG).show()
+                      return
+                  }
+                  File(d, "wavs").mkdirs()
+                  val list = if (lang == "hi") Sentences.HI else Sentences.EN
+                  File(d, "sentences.txt").writeText(list.joinToString("\n"))
+                  File(d, "lang.txt").writeText(lang)
+                  openProject(d)
+              }
+
+              private fun openProject(d: File) {
+                  projDir = d
+                  sentences = loadSentences(d)
+                  idx = sentences.indices.firstOrNull { !wav(d, it).exists() } ?: maxOf(0, sentences.size - 1)
+                  val st = tv("", 16f)
+                  val se = tv("", 28f)
+                  val rec = btn("रिकॉर्ड करें") { toggleRecord() }
+                  tvStatus = st; tvSentence = se; btnRec = rec
+                  val v = ArrayList<View>()
+                  v.add(tv(d.name, 22f))
+                  v.add(st)
+                  v.add(se)
+                  v.add(rec)
+                  v.add(btn("अपनी रिकॉर्डिंग सुनें") { playCurrent() })
+                  v.add(btn("पिछला वाक्य") { go(-1) })
+                  v.add(btn("अगला वाक्य") { go(1) })
+                  v.add(btn("अगला बिना रिकॉर्ड वाला वाक्य") { goNextEmpty() })
+                  v.add(btn("होम पर जाएँ") { showHome() })
+                  setContentView(page(v))
+                  refresh()
+                  if (sentences.isNotEmpty()) announce("वाक्य ${idx + 1}। ${sentences[idx]}")
+              }
+
+              private fun refresh() {
+                  val d = projDir ?: return
+                  if (sentences.isEmpty()) {
+                      tvSentence?.text = "इस प्रोजेक्ट में कोई वाक्य नहीं है"
+                      return
+                  }
+                  val done = sentences.indices.count { wav(d, it).exists() }
+                  val has = wav(d, idx).exists()
+                  tvStatus?.text = "वाक्य ${idx + 1} / ${sentences.size} — " +
+                      (if (has) "रिकॉर्ड हो चुका है" else "अभी रिकॉर्ड नहीं हुआ") + " — कुल $done रिकॉर्ड"
+                  tvSentence?.text = sentences[idx]
+                  btnRec?.text = if (recFlag) "रुकें और सेव करें" else if (has) "फिर से रिकॉर्ड करें" else "रिकॉर्ड करें"
+              }
+
+              private fun busy(): Boolean = recFlag || recThread?.isAlive == true
+
+              private fun go(delta: Int) {
+                  if (busy() || sentences.isEmpty()) return
+                  idx = (idx + delta).coerceIn(0, sentences.size - 1)
+                  refresh()
+                  announce("वाक्य ${idx + 1}। ${sentences[idx]}")
+              }
+
+              private fun goNextEmpty() {
+                  val d = projDir ?: return
+                  if (busy() || sentences.isEmpty()) return
+                  var target = -1
+                  for (i in idx + 1 until sentences.size) if (!wav(d, i).exists()) { target = i; break }
+                  if (target < 0) for (i in 0 until sentences.size) if (!wav(d, i).exists()) { target = i; break }
+                  if (target < 0) {
+                      announce("सभी वाक्य रिकॉर्ड हो चुके हैं")
+                      return
+                  }
+                  idx = target
+                  refresh()
+                  announce("वाक्य ${idx + 1}। ${sentences[idx]}")
+              }
+
+              // ---------- recording ----------
+              private fun toggleRecord() {
+                  if (recFlag) {
+                      stopRecording(false)
+                      refresh()
+                      return
+                  }
+                  if (recThread?.isAlive == true) return
+                  startRecording()
+              }
+
+              private fun stopRecording(disc: Boolean) {
+                  if (!recFlag) return
+                  discard = disc
+                  recFlag = false
+              }
+
+              private fun startRecording() {
+                  val d = projDir ?: return
+                  if (sentences.isEmpty()) return
+                  if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                      requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 1)
+                      return
+                  }
+                  releasePlayer()
+                  recFlag = true
+                  discard = false
+                  refresh()
+                  val myIdx = idx
+                  val target = wav(d, myIdx)
+                  val am = getSystemService(AUDIO_SERVICE) as AudioManager
+                  val fr = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
+                      .setAudioAttributes(
+                          AudioAttributes.Builder()
+                              .setUsage(AudioAttributes.USAGE_MEDIA)
+                              .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                              .build()
+                      )
+                      .setOnAudioFocusChangeListener { }
+                      .build()
+                  am.requestAudioFocus(fr)
+                  try {
+                      ToneGenerator(AudioManager.STREAM_MUSIC, 100).startTone(ToneGenerator.TONE_PROP_BEEP, 200)
+                  } catch (e: Exception) { }
+                  recThread = Thread {
+                      val pcm = ByteArrayOutputStream()
+                      try {
+                          Thread.sleep(500)
+                          if (recFlag) {
+                              val min = AudioRecord.getMinBufferSize(RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
+                              val rec = AudioRecord(
+                                  MediaRecorder.AudioSource.MIC, RATE,
+                                  AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
+                                  maxOf(min, RATE)
+                              )
+                              val buf = ByteArray(4096)
+                              rec.startRecording()
+                              while (recFlag) {
+                                  val n = rec.read(buf, 0, buf.size)
+                                  if (n > 0) pcm.write(buf, 0, n)
+                              }
+                              rec.stop()
+                              rec.release()
+                          }
+                      } catch (e: Exception) { }
+                      val data = pcm.toByteArray()
+                      var saved = false
+                      if (!discard && data.size > RATE / 2) {
+                          try {
+                              writeWav(target, data)
+                              saveMeta(d)
+                              saved = true
+                          } catch (e: Exception) { }
+                      }
+                      am.abandonAudioFocusRequest(fr)
+                      val ok = saved
+                      runOnUiThread { onRecordDone(ok, myIdx) }
+                  }
+                  recThread?.start()
+              }
+
+              private fun onRecordDone(saved: Boolean, i: Int) {
+                  if (projDir == null) return
+                  if (saved) {
+                      var advanced = false
+                      if (idx == i && idx < sentences.size - 1) { idx++; advanced = true }
+                      refresh()
+                      if (advanced) announce("रिकॉर्डिंग सेव हो गई। अगला वाक्य: ${sentences[idx]}")
+                      else announce("रिकॉर्डिंग सेव हो गई। यह आख़िरी वाक्य था।")
+                  } else {
+                      refresh()
+                      if (!discard) announce("रिकॉर्डिंग बहुत छोटी थी या नहीं हो सकी। फिर से कोशिश करें।")
+                  }
+              }
+
+              override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+                  super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+                  if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                      announce("माइक की अनुमति मिल गई। अब रिकॉर्ड बटन दबाएँ।")
+                  else
+                      announce("माइक की अनुमति के बिना रिकॉर्डिंग नहीं हो सकती।")
+              }
+
+              // ---------- playback ----------
+              private fun playCurrent() {
+                  val d = projDir ?: return
+                  if (busy() || sentences.isEmpty()) return
+                  val f = wav(d, idx)
+                  if (!f.exists()) {
+                      announce("इस वाक्य की रिकॉर्डिंग अभी नहीं है")
+                      return
+                  }
+                  releasePlayer()
+                  try {
+                      val p = MediaPlayer()
+                      p.setDataSource(f.absolutePath)
+                      p.setOnCompletionListener { releasePlayer() }
+                      p.prepare()
+                      p.start()
+                      player = p
+                  } catch (e: Exception) {
+                      announce("रिकॉर्डिंग चल नहीं सकी")
+                  }
+              }
+
+              private fun releasePlayer() {
+                  try { player?.release() } catch (e: Exception) { }
+                  player = null
+              }
+          }
+          EOF
+      - name: Build
+        run: gradle assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TTS-Dataset-APK
+          path: app/build/outputs/apk/debug/app-debug.apk

@@ -14,6 +14,51 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.7
+      - name: Fixed signing key
+        run: |
+          cat > ks.b64 <<'EOF'
+          /u3+7QAAAAIAAAABAAAAAQAPYW5kcm9pZGRlYnVna2V5AAABoSZAx2QAAAT/MIIE+zAMBgorBgEE
+          ASoCEQEBBIIE6fvJPEic1gOSHTwiX3RRATs+3j9LmU+eX0StcnqbhSdwg8vOEn8OfZMHLG1l41fM
+          0az6L9LX0yaCbPS6Sfg8JdWGSnFhNtr/DMx6x9L1nBB3XS/v0KlmbfKe+RPRQrX8FDbkRhk13twc
+          GKmsWWrPrT/0gn1PBhe9vwL7V4TIgQOgl7cr4y42CSa+lVRwDaUySoAaU4Ya3OAaCgVSFjiE7BOW
+          kYbK1Y4n96fmB2ETyvbE/BPGqRJd9ymyXuznjkygX2oOI0O79cr11nPPBPWF5sL7ufxJKUlyUmpv
+          l6fgzVvUOzotZ0aWc5Dhti2vx5jjJ4fJgrrRe+ykfK9wOEb/g3bCQQTrCShA0GuDNGwJK5YcvrHP
+          1jwbX4FxfgFNyF8TiyzeKu3VTLgjiIzD9D59kNC9DZ37IXEt++2EIPraAnnbMuUirG04ePTN7/tE
+          8QGKdhDL+O+XJ34qb6xCyNiO7Y39CCOin1jOZSAEas5daXYX7FoUbVDAIJWXfV/2hlVYeW5L6bUC
+          aFVcM9B5RUf5O3JpHb2RGtZyjqwOZaHig9oTYRG7bjTPVRmfTMUJAdltVrp/kypjmDl3vUf7h/ye
+          yW78oIlLjmpClfcLwSIWcrRlono1Bua8ZUKmQ+PD7HY3qdjzj2iWCzjcRyIxKoeInyZIC70ee0ov
+          szTSB1D7VeHYlPXPmIcdh8XlOJzZtHyiO1MIQYHbe2AVm+siUp6IJbW1zQkzYhoCNcYdyVDtPehS
+          jY/xCM0aKjNdtbs8s+IsYN9E5qmZPiQgNtKzFJkmGmTWnKj/Y/y300VLCZOtKFGMGKvbwJxjs5Af
+          jAl7LXnfcSMIEiz0chqMn1A3frZwkoFeCxwZImqqXq+fNonc2LeoXwH8ycIay9arh25mlW/Y3t0a
+          Jz2QgoU3KBYFZTzUer0dUt6XKi08TjYSakrKg49O5KJ1LA+ux/TAIUQg6wVfWqCkScYOSzjyvzb0
+          Jrw/17OQO5CWBv13DzbZ12miwvIf2cWSaIQw6JeUsoNZ4Nfbtnnoxa1eIcGdeHmeKq7KSYSwSU4p
+          +0FegRmUtGEhVWfZFl9w8UEv+1eabaHa2319BHdLAG0zuzvNjZAQpVYXPdCYCfEI4kTsVtNtFHF5
+          I0FndrOzmgQoB+qJyeAIB5Nmoa1L2omttuh/oPU8ZDWGkQ63lhQvuHuvVs4h0IIygrY2LLq/dpx0
+          k/8J1gJ56WWUQvmOhOX8/29H6kUuvc/mDIEWJKaACNTy1SLldA6x346S9BOvdglJhGNq4HlKS4AE
+          rUyaGGyHAF8tP2pokD3MGyLwQHrE5n7TfFpfTAhB5fqa2h07GM858RqR24V96qwUkVYEZIPu07H9
+          QBnu8A0syBW7KpQTqjrU8zLFIqQ6gQoWHbI+8dt6ImeF/czrkSANSzgUZbvaqB3f43+hnCGYqcII
+          u/8sU2AdHpIfvL4PrGnqGrothCepUQgSQFLMtXWuYCmnS2xYo67pi2CvztBENnRadLwc0JSBQ1uk
+          iRQ9aqwcwgl/MfNhUKRQV2RVmoSGKwzA42rsmvle4LI/xvXVLXoDFbigckETeRPLF4EKm2Fe/YQj
+          pnVL/CnTsrrj8Si8JhtkX0kAzjl6zsBG6Zfb+/Ps2XnegAf4rqj9Eog/LWPIkCu2LDQCBKi8kFZ+
+          ni74XoSG8CzPnQixIgAAAAEABVguNTA5AAADFzCCAxMwggH7oAMCAQICCFGDxRx5Z6opMA0GCSqG
+          SIb3DQEBDAUAMDcxCzAJBgNVBAYTAlVTMRAwDgYDVQQKEwdBbmRyb2lkMRYwFAYDVQQDEw1BbmRy
+          b2lkIERlYnVnMCAXDTI2MTAxMDE0MzkwMVoYDzIxMjYwOTE2MTQzOTAxWjA3MQswCQYDVQQGEwJV
+          UzEQMA4GA1UEChMHQW5kcm9pZDEWMBQGA1UEAxMNQW5kcm9pZCBEZWJ1ZzCCASIwDQYJKoZIhvcN
+          AQEBBQADggEPADCCAQoCggEBAOWbChG0rPvXkzrdMqet2Q8fz/4R2mQVRxvRArnTGySSstE6gNcx
+          usDrg2KguTSOlxDqtq+7AgvAuRLcxcI9x8JlpAXa14RZs36AyY9TbVtNj09W0mONWa20XOg2Ph2r
+          CLXcaecPyh+uvuoeQLtD0ILGjUQe6ZlZrjErTrALnDEe6YvKXzUs54aohF/i0bTSXSRTW+bkSRLe
+          CuiojD08VyMelmmiIHH9iKChppa50gtzn1BKmbRBPP3JU3ujbYhuWL6tUidXpHC9MN8ckdg69nAk
+          HmW5XViEuArlkM6lLFxJXL+ndir2/GUnfIBkqy1CvN5vlaQaPaYwtIZcAQvdc8kCAwEAAaMhMB8w
+          HQYDVR0OBBYEFHzUJgHBUII6pK7/i1PUZxxPmDyWMA0GCSqGSIb3DQEBDAUAA4IBAQBPoulbr1j0
+          dG1FgmR0MV1+vPLnPR/vKX6o9t1mj+6kxw+xqfenjQ57PfrI8z6Kr/kBEIlgYwQ5hxngYspNV/ma
+          9tSx/a83rKYSktOYOnpuAK4v+61O7hmNd5khcaOu4TbvVj6Kwo6OkwlqgrSfuTB07D1DAVVa8j34
+          NuiZYIh1x0CXCE2zsby6cIKwWGsJ3D2gZbU6WGYjyE6nQ286DwOQF4ks11wXApIdLmhK+hWTbiHN
+          PhnxSvqhkyX+hYsS14yUFKQstTxNCiSSHA3SLv/EPKiU9GZhX9QJcplXv4RY6F1AcBPqDwgk0l8f
+          XRBbYTVSsV8PrybHe5dhV/vHYLMZLEYerMF7kdkaVa6Kph/d/X9wjcc=
+          EOF
+          mkdir -p ~/.android
+          base64 -d ks.b64 > ~/.android/debug.keystore
+          keytool -list -keystore ~/.android/debug.keystore -storepass android > /dev/null 2>&1 || rm -f ~/.android/debug.keystore
       - name: Create project files
         run: |
           mkdir -p app/src/main/java/com/mohit/ttsdata
@@ -50,8 +95,8 @@ jobs:
                   applicationId "com.mohit.ttsdata"
                   minSdk 26
                   targetSdk 34
-                  versionCode 1
-                  versionName "1.0"
+                  versionCode 2
+                  versionName "2.0"
               }
               compileOptions {
                   sourceCompatibility JavaVersion.VERSION_17
@@ -64,6 +109,7 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.RECORD_AUDIO" />
+              <uses-permission android:name="android.permission.INTERNET" />
               <application
                   android:label="TTS डेटासेट"
                   android:allowBackup="true"
@@ -111,7 +157,37 @@ jobs:
                   "धन्यवाद, आपकी मदद के लिए मैं आपका आभारी हूँ।",
                   "सूरज पूरब से निकलता है और पश्चिम में डूबता है।",
                   "आज की परीक्षा मेरी उम्मीद से ज़्यादा आसान थी।",
-                  "जो लोग धैर्य रखते हैं, उन्हें अंत में सफलता ज़रूर मिलती है।"
+                  "जो लोग धैर्य रखते हैं, उन्हें अंत में सफलता ज़रूर मिलती है।",
+                  "मेरे घर के सामने एक बड़ा सा नीम का पेड़ है।",
+                  "आज सुबह मैंने समय पर स्नान किया और पूजा की।",
+                  "दुकानदार ने सब्ज़ियाँ तौलकर थैले में डाल दीं।",
+                  "रेलगाड़ी ठीक समय पर प्लेटफ़ॉर्म पर पहुँच गई।",
+                  "हमारे देश की संस्कृति बहुत पुरानी और समृद्ध है।",
+                  "क्या आप कल मेरे साथ पुस्तकालय चलेंगे?",
+                  "दादी माँ हर रात हमें नई कहानी सुनाती थीं।",
+                  "ठंड के मौसम में गरम कपड़े पहनना ज़रूरी है।",
+                  "नदी का पानी साफ़ रखना हम सबकी ज़िम्मेदारी है।",
+                  "उसने बड़ी मेहनत से यह प्रतियोगिता जीती।",
+                  "कृपया अपनी बारी का इंतज़ार कीजिए।",
+                  "आसमान में काले बादल घिर आए हैं।",
+                  "मुझे यह किताब पढ़कर बहुत कुछ सीखने को मिला।",
+                  "बगीचे में रंग-बिरंगे फूल खिले हुए हैं।",
+                  "अगर तुम सच बोलोगे तो तुम्हें डरने की ज़रूरत नहीं है।",
+                  "आज दोपहर को हम सबने साथ में खाना खाया।",
+                  "हमारी कक्षा में चालीस विद्यार्थी पढ़ते हैं।",
+                  "कृपया इस फ़ॉर्म में अपना पूरा नाम और पता लिखिए।",
+                  "मैं हर रविवार को अपने गाँव फ़ोन करके सबका हाल पूछता हूँ।",
+                  "स्वस्थ रहने के लिए रोज़ थोड़ी कसरत करना अच्छा होता है।",
+                  "बाज़ार में आज बहुत भीड़ थी।",
+                  "उसकी आवाज़ बहुत मीठी और साफ़ है।",
+                  "हमें पेड़ लगाने चाहिए और पर्यावरण को बचाना चाहिए।",
+                  "मेरी बहन ने मेरे लिए स्वादिष्ट हलवा बनाया।",
+                  "यात्रा के दौरान हमने कई सुंदर जगहें देखीं।",
+                  "जब मन शांत होता है तब हर काम आसान लगने लगता है।",
+                  "कृपया धीरे बोलिए ताकि सब आपकी बात समझ सकें।",
+                  "आज की शाम बहुत सुहावनी और ठंडी है।",
+                  "विज्ञान ने हमारे जीवन को बहुत आसान बना दिया है।",
+                  "आपसे मिलकर मुझे बहुत खुशी हुई, फिर मिलेंगे।"
               )
               val EN = listOf(
                   "Hello, the weather is really pleasant today.",
@@ -143,7 +219,37 @@ jobs:
                   "Thank you, I am grateful for your help.",
                   "The sun rises in the east and sets in the west.",
                   "Today's exam was easier than I expected.",
-                  "Those who stay patient eventually find success."
+                  "Those who stay patient eventually find success.",
+                  "There is a big neem tree in front of my house.",
+                  "This morning I took a bath on time and prayed.",
+                  "The shopkeeper weighed the vegetables and put them in a bag.",
+                  "The train reached the platform exactly on time.",
+                  "The culture of our country is very old and rich.",
+                  "Will you come with me to the library tomorrow?",
+                  "My grandmother used to tell us a new story every night.",
+                  "It is necessary to wear warm clothes in the cold season.",
+                  "Keeping the river water clean is everyone's responsibility.",
+                  "He won this competition through hard work.",
+                  "Please wait for your turn.",
+                  "Dark clouds have gathered in the sky.",
+                  "I learned a great deal from reading this book.",
+                  "Colorful flowers are blooming in the garden.",
+                  "If you speak the truth, you have nothing to fear.",
+                  "This afternoon we all had lunch together.",
+                  "There are forty students in our class.",
+                  "Please write your full name and address on this form.",
+                  "Every Sunday I call my village and ask how everyone is doing.",
+                  "A little exercise every day is good for staying healthy.",
+                  "The market was very crowded today.",
+                  "Her voice is very sweet and clear.",
+                  "We should plant trees and protect the environment.",
+                  "My sister made delicious sweet pudding for me.",
+                  "During the journey we saw many beautiful places.",
+                  "When the mind is calm, every task begins to feel easy.",
+                  "Please speak slowly so that everyone can understand you.",
+                  "This evening is very pleasant and cool.",
+                  "Science has made our lives much easier.",
+                  "It was a pleasure meeting you, see you again."
               )
           }
           EOF
@@ -153,16 +259,26 @@ jobs:
           import android.Manifest
           import android.app.Activity
           import android.app.AlertDialog
+          import android.content.ContentValues
           import android.content.pm.PackageManager
           import android.media.*
+          import android.os.Build
           import android.os.Bundle
+          import android.os.Environment
+          import android.provider.MediaStore
           import android.view.View
           import android.widget.*
+          import org.json.JSONObject
           import java.io.ByteArrayOutputStream
           import java.io.File
+          import java.io.OutputStream
+          import java.net.HttpURLConnection
+          import java.net.URL
           import java.nio.ByteBuffer
           import java.nio.ByteOrder
           import java.util.Locale
+          import java.util.zip.ZipEntry
+          import java.util.zip.ZipOutputStream
 
           class MainActivity : Activity() {
               private val RATE = 22050
@@ -172,6 +288,7 @@ jobs:
               private var idx = 0
               @Volatile private var recFlag = false
               @Volatile private var discard = false
+              @Volatile private var fetching = false
               private var recThread: Thread? = null
               private var player: MediaPlayer? = null
               private var tvStatus: TextView? = null
@@ -322,6 +439,9 @@ jobs:
                   v.add(btn("पिछला वाक्य") { go(-1) })
                   v.add(btn("अगला वाक्य") { go(1) })
                   v.add(btn("अगला बिना रिकॉर्ड वाला वाक्य") { goNextEmpty() })
+                  v.add(btn("इंटरनेट से और वाक्य जोड़ें") { fetchMore() })
+                  v.add(btn("प्रोजेक्ट की ज़िप बनाएँ") { exportZip() })
+                  v.add(btn("यह प्रोजेक्ट मिटाएँ") { confirmDelete() })
                   v.add(btn("होम पर जाएँ") { showHome() })
                   setContentView(page(v))
                   refresh()
@@ -358,12 +478,153 @@ jobs:
                   for (i in idx + 1 until sentences.size) if (!wav(d, i).exists()) { target = i; break }
                   if (target < 0) for (i in 0 until sentences.size) if (!wav(d, i).exists()) { target = i; break }
                   if (target < 0) {
-                      announce("सभी वाक्य रिकॉर्ड हो चुके हैं")
+                      announce("सभी वाक्य रिकॉर्ड हो चुके हैं। चाहें तो इंटरनेट से और वाक्य जोड़ें।")
                       return
                   }
                   idx = target
                   refresh()
                   announce("वाक्य ${idx + 1}। ${sentences[idx]}")
+              }
+
+              private fun confirmDelete() {
+                  val d = projDir ?: return
+                  if (busy()) return
+                  AlertDialog.Builder(this)
+                      .setTitle("प्रोजेक्ट मिटाएँ?")
+                      .setMessage("${d.name} और उसकी सारी रिकॉर्डिंग हमेशा के लिए मिट जाएँगी।")
+                      .setPositiveButton("हाँ, मिटाएँ") { _, _ -> d.deleteRecursively(); showHome() }
+                      .setNegativeButton("रद्द करें", null)
+                      .show()
+              }
+
+              // ---------- more sentences from internet ----------
+              private fun splitSentences(raw: String, lang: String): List<String> {
+                  val t = raw.replace('\n', ' ')
+                  val parts = if (lang == "hi") t.split("।") else t.split(Regex("(?<=[.!?])\\s+"))
+                  val out = ArrayList<String>()
+                  for (p in parts) {
+                      var s = p.trim()
+                      if (s.isEmpty()) continue
+                      if (lang == "hi") s += "।"
+                      if (s.length < 30 || s.length > 120) continue
+                      if (s.any { it.isDigit() }) continue
+                      if (s.any { it == '|' || it == '(' || it == ')' || it == '[' || it == ']' || it == '"' || it == ';' || it == ':' }) continue
+                      if (lang == "hi") {
+                          if (s.any { it in 'A'..'Z' || it in 'a'..'z' }) continue
+                          val letters = s.filter { it.isLetter() }
+                          if (letters.isEmpty()) continue
+                          val dev = letters.count { it.code in 0x0900..0x097F }
+                          if (dev * 100 / letters.length < 95) continue
+                      } else {
+                          if (!s.all { it.code < 128 }) continue
+                          if (!s[0].isUpperCase()) continue
+                          if (!(s.endsWith(".") || s.endsWith("?") || s.endsWith("!"))) continue
+                      }
+                      out.add(s)
+                  }
+                  return out
+              }
+
+              private fun fetchMore() {
+                  val d = projDir ?: return
+                  if (busy() || fetching) return
+                  fetching = true
+                  announce("इंटरनेट से नए वाक्य लाए जा रहे हैं, कृपया एक मिनट प्रतीक्षा करें")
+                  val lf = File(d, "lang.txt")
+                  val lang = if (lf.exists()) lf.readText().trim() else "hi"
+                  val known = HashSet<String>(sentences)
+                  Thread {
+                      val found = ArrayList<String>()
+                      var tries = 0
+                      var fails = 0
+                      while (found.size < 40 && tries < 60 && fails < 3) {
+                          tries++
+                          try {
+                              val c = URL("https://$lang.wikipedia.org/api/rest_v1/page/random/summary").openConnection() as HttpURLConnection
+                              c.connectTimeout = 8000
+                              c.readTimeout = 8000
+                              c.setRequestProperty("User-Agent", "TTSDatasetRecorder/1.0 (personal voice dataset)")
+                              val body = c.inputStream.bufferedReader().use { it.readText() }
+                              val extract = JSONObject(body).optString("extract", "")
+                              for (s in splitSentences(extract, lang)) {
+                                  if (!known.contains(s)) { known.add(s); found.add(s) }
+                              }
+                              fails = 0
+                          } catch (e: Exception) {
+                              fails++
+                          }
+                      }
+                      if (found.isNotEmpty()) {
+                          try {
+                              File(d, "sentences.txt").appendText("\n" + found.joinToString("\n"))
+                          } catch (e: Exception) { }
+                      }
+                      runOnUiThread {
+                          fetching = false
+                          if (projDir == d) {
+                              sentences = loadSentences(d)
+                              refresh()
+                              if (found.isEmpty()) announce("कोई नया वाक्य नहीं मिला। इंटरनेट चालू है या नहीं जाँचें, या दोबारा कोशिश करें।")
+                              else announce("${found.size} नए वाक्य जुड़ गए। अब कुल ${sentences.size} वाक्य हैं।")
+                          }
+                      }
+                  }.start()
+              }
+
+              // ---------- zip export ----------
+              private fun exportZip() {
+                  val d = projDir ?: return
+                  if (busy()) return
+                  val n = sentences.indices.count { wav(d, it).exists() }
+                  if (n == 0) {
+                      announce("अभी कोई रिकॉर्डिंग नहीं है")
+                      return
+                  }
+                  announce("ज़िप बन रही है, कृपया प्रतीक्षा करें")
+                  val list = sentences
+                  Thread {
+                      var msg: String
+                      try {
+                          saveMeta(d)
+                          val name = d.name + ".zip"
+                          val out: OutputStream
+                          val where: String
+                          if (Build.VERSION.SDK_INT >= 29) {
+                              val cv = ContentValues()
+                              cv.put(MediaStore.Downloads.DISPLAY_NAME, name)
+                              cv.put(MediaStore.Downloads.MIME_TYPE, "application/zip")
+                              cv.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                              val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, cv)!!
+                              out = contentResolver.openOutputStream(uri)!!
+                              where = "Downloads फोल्डर"
+                          } else {
+                              val dir = getExternalFilesDir(null)!!
+                              out = File(dir, name).outputStream()
+                              where = dir.absolutePath
+                          }
+                          ZipOutputStream(out.buffered()).use { z ->
+                              z.putNextEntry(ZipEntry("metadata.csv"))
+                              z.write(File(d, "metadata.csv").readBytes())
+                              z.closeEntry()
+                              for (i in list.indices) {
+                                  val f = wav(d, i)
+                                  if (f.exists()) {
+                                      z.putNextEntry(ZipEntry("wavs/" + f.name))
+                                      f.inputStream().use { it.copyTo(z) }
+                                      z.closeEntry()
+                                  }
+                              }
+                          }
+                          msg = "ज़िप तैयार हो गई: $name, $where में, $n रिकॉर्डिंग"
+                      } catch (e: Exception) {
+                          msg = "ज़िप नहीं बन सकी"
+                      }
+                      val m = msg
+                      runOnUiThread {
+                          announce(m)
+                          Toast.makeText(this, m, Toast.LENGTH_LONG).show()
+                      }
+                  }.start()
               }
 
               // ---------- recording ----------
